@@ -28,3 +28,29 @@ for name in row:
     for i in colNames:
         print(i[1], '| ', end = '')
     print('')
+
+    # 4
+import pandas as pd
+query4 = 'SELECT LASTNAME, FIRSTNAME, STATE\
+          FROM CUSTOMERS'
+cursor.execute(query4)
+customers = cursor.fetchall()
+customersDF = pd.DataFrame(customers, columns = [name[0] for name in cursor.description])
+print(customersDF)
+
+# 5
+query5 = 'SELECT ORDERNUM, QUANTITY, PAIDEACH\
+          FROM ORDERITEMS'
+cursor.execute(query5)
+orders = cursor.fetchall()
+orderItemsDF = pd.DataFrame(orders, columns = [name[0] for name in cursor.description])
+print(orderItemsDF)
+
+query5 = 'SELECT ORDERNUM, QUANTITY, PAIDEACH,\
+          (QUANTITY*PAIDEACH) AS TOTAL\
+          FROM ORDERITEMS'
+cursor.execute(query5)
+orders = cursor.fetchall()
+orderItemsDF = pd.DataFrame(orders, columns = [name[0] for name in cursor.description])
+print(orderItemsDF)
+print('\n\tTotal Revenue = ${}'.format(orderItemsDF["TOTAL"].sum()))
