@@ -38,6 +38,8 @@ customers = cursor.fetchall()
 customersDF = pd.DataFrame(customers, columns = [name[0] for name in cursor.description])
 print(customersDF)
 
+# need to sort by state, lastname, etc see pdf
+
 # 5
 query5 = 'SELECT ORDERNUM, QUANTITY, PAIDEACH\
           FROM ORDERITEMS'
@@ -54,3 +56,21 @@ orders = cursor.fetchall()
 orderItemsDF = pd.DataFrame(orders, columns = [name[0] for name in cursor.description])
 print(orderItemsDF)
 print('\n\tTotal Revenue = ${}'.format(orderItemsDF["TOTAL"].sum()))
+
+# 6
+query6 = 'CREATE TABLE BOOKLIST AS\
+          SELECT LNAME, FNAME, TITLE\
+          FROM BOOKS JOIN BOOKAUTHOR USING ISBN\
+              JOIN AUTHOR USING AUTHORID'
+cursor.execute(query6)
+
+
+bookQuery = 'SELECT *\
+            FROM BOOKLIST'
+cursor.execute(bookQuery)
+books = cursor.fetchall()
+print(books)
+
+# 7
+booklistDF = pd.DateFrame(books, columns = [name[0] for name in cursor.description])
+print(booklistDF)
