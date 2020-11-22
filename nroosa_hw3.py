@@ -37,8 +37,10 @@ cursor.execute(query4)
 customers = cursor.fetchall()
 customersDF = pd.DataFrame(customers, columns = [name[0] for name in cursor.description])
 print(customersDF)
-
-# need to sort by state, lastname, etc see pdf
+customersDF.sort_values(by = ['STATE'], inplace = True)
+print(customersDF)
+customersDF.sort_values(by = ['STATE', 'LASTNAME'], inplace = True)
+print(customersDF)
 
 # 5
 query5 = 'SELECT ORDERNUM, QUANTITY, PAIDEACH\
@@ -60,17 +62,53 @@ print('\n\tTotal Revenue = ${}'.format(orderItemsDF["TOTAL"].sum()))
 # 6
 query6 = 'CREATE TABLE BOOKLIST AS\
           SELECT LNAME, FNAME, TITLE\
-          FROM BOOKS JOIN BOOKAUTHOR USING ISBN\
-              JOIN AUTHOR USING AUTHORID'
+          FROM BOOKS, BOOKAUTHOR, AUTHOR\
+          WHERE BOOKS.ISBN = BOOKAUTHOR.ISBN AND\
+              BOOKAUTHOR.AUTHORID = AUTHOR.AUTHORID'
 cursor.execute(query6)
-
-
 bookQuery = 'SELECT *\
             FROM BOOKLIST'
 cursor.execute(bookQuery)
 books = cursor.fetchall()
 print(books)
 
+
 # 7
-booklistDF = pd.DateFrame(books, columns = [name[0] for name in cursor.description])
+booklistDF = pd.DataFrame(books, columns = [name[0] for name in cursor.description])
 print(booklistDF)
+booklistDF.sort_values(by = ['LNAME', 'FNAME'], inplace = True)
+print(booklistDF)
+
+queryGroup = 'SELECT LNAME, COUNT(*)\
+              FROM BOOKLIST\
+              GROUP BY LNAME'
+
+cursor.execute(queryGroup)
+grouped = cursor.fetchall()
+print(grouped)
+
+#there are two people with the last name 'WHITE' that are being counted together
+#to get the correct counts for individual authors, we need to group by LNAME and FNAME
+
+
+# 8
+queryX = 'SELECT name\
+          FROM sqlite_master\
+          WHERE type="table"'
+cursor.execute(queryX)
+row = cursor.fetchall()
+
+for name in row:
+    print('\nTable: {}'.format(name[0]))
+    queryY = 'PRAGMA table_info('+name[0]+')'
+    cursor.execute(queryY)
+    colNames = cursor.fetchall()
+    print('Columns: ', end = '')
+    for i in colNames:
+        print(i[1], '| ', end = '')
+    queryZ = 'SELECT COUNT(*)\
+              FROM ('+name[0]+')'
+    cursor.execute(queryZ)
+    count = cursor.fetchall()
+    print('\n # Rows = ', count[0][0])
+    print('')
